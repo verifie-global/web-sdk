@@ -3,12 +3,12 @@
 ## Getting started
 
 
-### 1. Obtaining an License Key
+### 1. Obtaining a License Key
 
 In order to start integration, you will need the **License Key**. You can mail a request to contact@verifie.global.
 
 
-### 2. Creating a session
+### 2. Creating a Session
 
 With your License key, you should create a session by making a request to the Verifie backend from your server:
 
