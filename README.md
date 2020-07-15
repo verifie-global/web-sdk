@@ -29,6 +29,6 @@ $ curl -X GET "https://api.verifie.ai/api/Main/TransactionInfo" -H "accept: text
 ```
 
 
-
+## Sessions Lifecycle
 
 ![flow](https://github.com/verifie-global/web-sdk/blob/master/flow.png?raw=true)
