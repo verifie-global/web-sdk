@@ -1,6 +1,6 @@
 # Verifie web-sdk
 
-## Getting started
+## Getting started with iframe solution, or You can use sample html app in sampleApp directory.
 
 
 ### 1. Obtaining a License Key
