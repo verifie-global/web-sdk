@@ -17,6 +17,11 @@ $ curl -X GET "https://api.verifie.ai/api/Main/AccessToken?LicenseKey=YOUR_LICEN
   -H "accept: text/plain" -H "Lang: ENG"
 
 ```
+
+```shell
+<iframe src="https://web.verifie.ai/ENG/index.html?token=xxx&resultUrl=..." width="70%" height="80%" allow="camera"></iframe>
+```
+
 You will receive a response containing a JSON Web Token and iframe url.
 
 
