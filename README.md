@@ -17,15 +17,13 @@ $ curl -X GET "https://api.verifie.ai/api/Main/AccessToken?LicenseKey=YOUR_LICEN
   -H "accept: text/plain" -H "Lang: ENG"
 
 ```
+You will receive a response containing a JSON Web Token and iframe url.
 
 Sample of iframe code:
 
 ```shell
 <iframe src="https://web.verifie.ai/ENG/index.html?token=xxx&redirectUrl=..." width="70%" height="80%" allow="camera"></iframe>
 ```
-
-You will receive a response containing a JSON Web Token and iframe url.
-
 
 ### 3. Get session verification info
 
