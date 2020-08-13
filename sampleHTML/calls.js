@@ -3,7 +3,7 @@ const personID = window.navigator.userAgent;
 
 
 var getAccessToken = async () => {
-    const result =  await fetch(`https://api.verifie.global/api/Main/AccessToken?LicenseKey=${licenceKey}&PersonID=${personID}`);
+    const result =  await fetch(`https://api.verifie.ai/api/Main/AccessToken?LicenseKey=${licenceKey}&PersonID=${personID}`);
     const res = await result.json();
     return res.result.accessToken;
 }
@@ -23,7 +23,7 @@ var getDocumentData = async (imageData) => {
         documentImage: imageData
     };
 
-    const result = await fetch("https://api.verifie.global/api/Main/Document", {
+    const result = await fetch("https://api.verifie.ai/api/Main/Document", {
         method: 'POST',
         body: JSON.stringify(body),
         headers,
@@ -42,7 +42,7 @@ var getScoringData = async (imageData) => {
         selfieImage: imageData
     };
 
-    const result = await fetch("https://api.verifie.global/api/Main/Score", {
+    const result = await fetch("https://api.verifie.ai/api/Main/Score", {
         method: 'POST',
         body: JSON.stringify(body),
         headers,
