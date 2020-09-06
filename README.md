@@ -6,7 +6,7 @@
 ### 1. Obtaining a License Key
 
 In order to start integration, you will need the **License Key**. You can mail a request to contact@verifie.global.
-Also You can try a <a href="https://demo.verifie.ai/">demo sample</a>.
+Also You can try a <a href="https://demo.verifie.ai/">sample website</a>.
 
 ### 2. Creating a Session
 
