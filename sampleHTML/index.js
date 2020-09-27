@@ -136,10 +136,10 @@
 					// check the detection score
 					// if it's above the threshold, draw it
                     // (the constant 50.0 is empirical: other cascades might require a different one)
-					if (!failedStatus && iterationTick - failedStatusTick  > 10000) {
-						failedStatus = true;
-					} 
-					if (failedStatus) {
+					//if (!failedStatus && iterationTick - failedStatusTick  > 10000) {
+					//	failedStatus = true;
+					//} 
+					//if (failedStatus) {
 						// ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 						// // canvas.height = 0;
 						// // canvas.width = 0;
@@ -150,8 +150,8 @@
 						// 	"Unfortunately, your face recognition is failed.Please try again",
 						// 	'error'
 						// )
-					}
-					if(dets[i][3] > 60.0)
+					//}
+					if(dets[i][3] > 40.0)
 					{
                         const faceArea = Math.PI * Math.pow(dets[i][2]/2 , 2);
                         const webcamArea  = canvasWidth * canvasHeight;
