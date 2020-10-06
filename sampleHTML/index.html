@@ -34,7 +34,10 @@
         </div>
         <button onclick="handleDocumentPhotoClick()" id="takePhotoBTN" class="btn">Take a photo</button>
         </div>
-        <!-- <button onclick="button_callback()" class="btn">Upload back side</button> -->
+        <div id="backSideDocContent" style="display:none">
+            <button onclick="document.querySelector('#document2').click()"  class="btn" id="UploadSecondPage">Upload back side</button>
+            <input type="file" onchange="handleUploadDocumentBackSide()" id="document2" style="display:none" />
+        </div>
         <div id="backSide" style="display: none;justify-content: center;">
         </div>
         <div class="canvas-container">
@@ -42,6 +45,8 @@
             <canvas id="stegCanvas" style="display: none;"></canvas>
         </div>
         <button onclick="handleCaptureDocument()" style="display: none;" class="btn" id="captureBTN">Capture</button>
+        <button onclick="document.querySelector('#document1').click()"  class="btn" id="UploadFirstPage">Upload a photo</button>
+        <input type="file" onchange="handleUploadDocument()" id="document1" style="display:none" />
     </div>
     <script>
         var cameraStartTick;
