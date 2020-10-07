@@ -56,6 +56,7 @@ CanvasRenderingContext2D.prototype.roundedRectangle = function (x, y, w, h, r) {
 	}
 
 	function button_callback() {
+		document.getElementsByClassName("canvas-outer")[0].style.display = "block";
 		/*
 			(0) check whether we're already running face detection
 		*/
@@ -240,6 +241,7 @@ CanvasRenderingContext2D.prototype.roundedRectangle = function (x, y, w, h, r) {
 	function handleDocumentPhotoClick() {
 		document.getElementById("content").style.display = "none";
 		document.getElementById("UploadFirstPage").style.display = "none";
+		document.getElementsByClassName("canvas-outer")[0].style.display = "block";
 		var canvas = document.getElementsByTagName('canvas')[0];
 		canvas.width = window.innerWidth < 900 ? window.innerWidth - 20 : 600 ;
 		canvas.height = window.innerWidth < 900 ? 220 : 400 ;
@@ -306,6 +308,8 @@ CanvasRenderingContext2D.prototype.roundedRectangle = function (x, y, w, h, r) {
 	}
 
 	const handleUploadDocument = async () => {
+		document.getElementById("content").style.display = "none";
+		document.getElementById("UploadFirstPage").style.display = "none";
 		const file = document.getElementById('document1').files[0];
 		const parsedFile = await toBase64(file);
 		const editedSnap = await encodeImage(accessToken, parsedFile);
@@ -364,7 +368,9 @@ CanvasRenderingContext2D.prototype.roundedRectangle = function (x, y, w, h, r) {
 						"Opposite Side",
 						message,
 						"info"
-					);
+					).then(() => {
+						document.querySelector('#document2').click();
+					});
 					if(isUpload) {
 						document.getElementById("content").style.display = "none";
 						document.getElementById("UploadFirstPage").style.display = "none";
