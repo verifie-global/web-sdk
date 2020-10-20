@@ -159,12 +159,12 @@
 
 						
 						
-                        if (facePercentage < 20) {
+                        if (facePercentage < 29) {
                             cameraStartTick = iterationTick;
                             snapshotTickCompleted = false;
 							draw("Move Closer")
                         } 
-                        else  if (facePercentage > 35){
+                        else  if (facePercentage > 45){
                             cameraStartTick = iterationTick;
                             snapshotTickCompleted = false;
 							draw("Move Away");
@@ -183,7 +183,7 @@
 								getScoringData(editedSnap).then((res) => {
 									console.log(personData);
 									if (res.opDesc == 'ok') {
-										if (res.result.facialScore && res.result.isMatched) {
+										if (res.result.isMatched && res.result.facialLiveness) {
 											Swal.fire({
 												title: "Verified",
 												icon: "success",
