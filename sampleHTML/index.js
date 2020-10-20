@@ -160,7 +160,7 @@ CanvasRenderingContext2D.prototype.roundedRectangle = function (x, y, w, h, r) {
 
 					
 					
-					if (facePercentage < 20) {
+					if (facePercentage < 29) {
 						cameraStartTick = iterationTick;
 						snapshotTickCompleted = false;
 						draw("Move Closer")
@@ -184,7 +184,7 @@ CanvasRenderingContext2D.prototype.roundedRectangle = function (x, y, w, h, r) {
 							getScoringData(editedSnap).then((res) => {
 								console.log(personData);
 								if (res.opDesc == 'ok') {
-									if (res.result.facialScore && res.result.isMatched) {
+									if (res.result.isMatched && res.result.facialLiveness) {
 										Swal.fire({
 											title: "Verified",
 											icon: "success",
