@@ -159,7 +159,7 @@
 
 						
 						
-                        if (facePercentage < 29) {
+                        if (facePercentage < 27) {
                             cameraStartTick = iterationTick;
                             snapshotTickCompleted = false;
 							draw("Move Closer")
