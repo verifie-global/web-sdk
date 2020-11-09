@@ -85,9 +85,9 @@ body{
     margin: 0 auto;
     display: block;
     background: white;
-    border: 2px solid #2760ae;
+    border: 2px solid #F14100;
     margin-top: 15px;
-    color: #2760ae;
+    color: #F14100;
     padding: 15px;
     border-radius: 10px;
     width: 200px;
@@ -99,7 +99,7 @@ body{
 }
 
 .btn:hover{
-    background-color: #2760ae;
+    background-color: #F14100;
     color: #fff;
 }
 
@@ -137,7 +137,7 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #2760ae;
+    color: #F14100;
     border-radius: 15px;
     box-shadow: 2px 2px 19px 3px #8480802e;
     position: absolute;
@@ -161,6 +161,15 @@ body{
 
 .swal-text{ 
     text-align: center;
+}
+
+.swal2-actions .swal2-confirm.swal2-styled{
+    background-color: #F14100;
+}
+
+.swal2-icon.swal2-info{
+    border-color: #F14100!important;
+    color: #F14100!important;
 }
 
 .canvas-container{
