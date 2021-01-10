@@ -146,7 +146,6 @@
     canvas.height = canvasHeight;
     canvas.style.display = "block";
     const ctx = canvas.getContext("2d");
-    
     const faceOptions = {
       firstFixedPos: 0,
       lastFixedPos: 0,
@@ -245,11 +244,15 @@
 						document.getElementById("content").style.display = "block";
 						document.getElementById("uploadFirstPage").style.display = "block";
 						document.getElementsByClassName("canvas-outer")[0].style.display = "none";
-						Swal.fire(
+						initialized = false;
+						const swapFireRes = await Swal.fire(
 						  tr.notVerifiedText,
 						  tr.faceVerificationFailedText,
 						  "error"
 						);
+						if (swapFireRes.value) {
+						  window.location.href = "https://demo.verifie.ai/v2/";
+						}
 					  }
 					} else {
 					  Swal.fire(tr.exceptionText, scoringDataRes.opDesc, "error");
@@ -265,21 +268,28 @@
 			  else {
 				  faceOptions.failedStatus = true;
 			  }
-            }
-          } else {
+            } else if (
+				faceOptions.snapshotTickCompleted &&
+				faceOptions.failedStatus
+				) {
 			    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 				canvas.style.display = "none";
 				canvasTxt.style.display = "none";
 				this.stop();
+				initialized = false;
 				document.getElementById("content").style.display = "block";
 				document.getElementById("uploadFirstPage").style.display = "block";
 				document.getElementsByClassName("canvas-outer")[0].style.display = "none";
-				Swal.fire(
+				const swapFireRes = await Swal.fire(
 				  tr.notVerifiedText,
 				  tr.faceVerificationFailedText,
 				  "error"
 				);
+				if (swapFireRes.value) {
+					window.location.href = "https://demo.verifie.ai/v2/";
+				}
 			}
+          } 
         } else {
           draw(tr.frameFaceText);
         }
