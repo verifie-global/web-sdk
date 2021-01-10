@@ -21,7 +21,7 @@ function camvas(ctx, callback) {
 
   streamContainer.appendChild(this.video)
   document.body.appendChild(streamContainer)
-
+  const Ratio = 0.8;
 
 const getConfig = () => {
   if (window.innerWidth < 900) {
@@ -55,11 +55,17 @@ if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
   navigator.mediaDevices.getUserMedia(getConfig()).then(function(stream) {
     // Yay, now our webcam input is treated as a normal video and
     // we can start having fun
-    self.video.srcObject = stream
-    // Let's start drawing the canvas!
+    self.video.srcObject = stream;
+	if (canvasMode === "mobile") {
+		ctx.save();
+		ctx.translate(canvas.width, 0);
+		ctx.scale(-1, 1);
+	}
+	// Let's start drawing the canvas!
     cameraStartTick = Date.now();
-    failedStatusTick = Date.now();
+	failedStatusTick = Date.now();
     document.getElementById("canvas").classList.add("visible");
+	document.getElementById("canvasTxt").classList.add("visible");
     self.update()
   }, function(err) {
     throw err
@@ -69,7 +75,7 @@ if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
  
 
   this.stop = function() {
-    console.log(self);
+    
     const tracks = self.video.srcObject.getTracks();
     tracks[0].stop();
   }
