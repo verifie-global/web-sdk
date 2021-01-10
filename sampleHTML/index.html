@@ -1,59 +1,75 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="chrome=1">
-        <title>Verifie Web Demo</title>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="./index.css">
-		<script src="camvas.js"></script>
-        <script src="pico.js"></script>
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    </head>
-	<body>
-        <div class="loaderOuter" id="loader" style="display: none">
-            <img src="./src/img/spinner.svg" />
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <title>Verifie Web Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./index.css">
+  <script src="https://unpkg.com/@tensorflow/tfjs-core@2.1.0/dist/tf-core.js"></script>
+  <script src="https://unpkg.com/@tensorflow/tfjs-converter@2.1.0/dist/tf-converter.js"></script>
+  <script src="https://unpkg.com/@tensorflow/tfjs-backend-wasm@2.1.0/dist/tf-backend-wasm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+</head>
+
+<body>
+  <div class="loaderOuter" id="loader" style="display: none">
+    <img src="./src/img/spinner.svg" alt="" />
+  </div>
+  <div id="content">
+    <div class="content">
+      <div class="button-outer">
+        <input type="radio" checked="true" value="passport" style="display: none;" name="documentType" />
+        <div class="img-container active" style="width:216px;margin: 0 auto;" onclick="handleImageClick(event)">
+          <img src="./src/img/passport.svg" alt="" />
+          <p id="passportText" class="title"></p>
         </div>
-        <div id="content">
-        <div class="content">
-            <div class="button-outer">
-                <input type="radio" checked="true" value="passport" style="display: none;" name="documentType"/>
-                <div class="img-container active" style="width:216px;margin: 0 auto;" onclick="handleImageClick(event)">
-                    <img src="./src/img/passport.png"/>
-                    <p class="title">PASSPORT</p>
-                </div>
-                    
-            </div>
-            <div class="button-outer">
-                <input type="radio" checked="false" value="idCard" style="display: none;"  name="documentType" />
-                <div class="img-container" onclick="handleImageClick(event)" style="width:216px;margin: 0 auto;">
-                    <img src="./src/img/id-card.png"/>
-                    <p class="title">ID CARD</p>
-                </div>
-            </div>
+      </div>
+      <div class="button-outer">
+        <input type="radio" checked="false" value="idCard" style="display: none;" name="documentType" />
+        <div class="img-container" onclick="handleImageClick(event)" style="width:216px;margin: 0 auto;">
+          <img src="./src/img/id-card.svg" alt="" />
+          <p id="idCardText" class="title"></p>
         </div>
-        <button onclick="handleDocumentPhotoClick()" id="takePhotoBTN" class="btn">Take a photo</button>
-        </div>
-        <!-- <button onclick="button_callback()" class="btn">Upload back side</button> -->
-        <div id="backSide" style="display: none;justify-content: center;">
-        </div>
-        <div class="canvas-container">
-            <canvas id="canvas" style="display: none;"></canvas>
-            <canvas id="stegCanvas" style="display: none;"></canvas>
-        </div>
-        <button onclick="handleCaptureDocument()" style="display: none;" class="btn" id="captureBTN">Capture</button>
+      </div>
     </div>
-    <script>
-        var cameraStartTick;
-        var failedStatusTick;
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-    <script src="./calls.js"></script>   
-    <script src="./base64.js"></script>
-    <script src="./libs/jsimg.js"></script>
-    <script src="./libs/main2.js"></script>
-    <script src="./libs/prng4.js"></script>
-    <script src="./libs/sjcl.js"></script>
-    <script src="./index.js"></script>
-	</body>
+    <button onclick="handleDocumentPhotoClick()" id="takePhotoBtn" class="btn"></button>
+    <p id="orText" class="or"></p>
+  </div>
+  <div id="backSideDocContent" style="display:none">
+    <button onclick="document.querySelector('#document2').click()" style="display:none" class="btn"
+      id="uploadSecondPage"></button>
+    <input type="file" onchange="handleUploadDocumentBackSide()" id="document2" style="display:none" />
+  </div>
+  <div id="backSide" style="display: none;justify-content: center;">
+  </div>
+  <div class="canvas-container">
+    <div class="canvas-outer">
+      <canvas id="canvas" style="display: none;"></canvas>
+	  <canvas id="canvasTxt" width="500px" style="display: none;"></canvas>
+    </div>
+  </div>
+  <button onclick="handleCaptureDocument()" style="display: none;" class="btn" id="captureBtn"></button>
+  <button onclick="document.querySelector('#document1').click()" class="btn" id="uploadFirstPage"></button>
+  <input type="file" onchange="handleUploadDocument()" id="document1" style="display:none" />
+
+  <script>
+    var cameraStartTick;
+    var failedStatusTick;
+  </script>
+  <script src="./camvas.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+  <script src="./lang.js"></script>
+  <script src="./snapshot-tick.js"></script>
+  <script src="./index.js"></script>
+  <script src="./calls.js"></script>
+  <script src="./base64.js"></script>
+  <script src="./libs/jsimg.js"></script>
+  <script src="./libs/main2.js"></script>
+  <script src="./libs/prng4.js"></script>
+  <script src="./libs/sjcl.js"></script>
+</body>
+
 </html>
