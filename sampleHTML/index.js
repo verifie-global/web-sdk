@@ -266,7 +266,20 @@
 				  faceOptions.failedStatus = true;
 			  }
             }
-          }
+          } else {
+			    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+				canvas.style.display = "none";
+				canvasTxt.style.display = "none";
+				this.stop();
+				document.getElementById("content").style.display = "block";
+				document.getElementById("uploadFirstPage").style.display = "block";
+				document.getElementsByClassName("canvas-outer")[0].style.display = "none";
+				Swal.fire(
+				  tr.notVerifiedText,
+				  tr.faceVerificationFailedText,
+				  "error"
+				);
+			}
         } else {
           draw(tr.frameFaceText);
         }
