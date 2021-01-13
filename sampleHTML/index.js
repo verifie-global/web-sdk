@@ -342,8 +342,10 @@
           (function loop() {
             if (!$video.paused && !$video.ended) {
               canvas.height = hRatio;
-              ctx.translate(canvas.width, 0);
-              ctx.scale(-1, 1);
+			  if (canvasMode == "mobile"){
+				ctx.translate(canvas.width, 0);
+				ctx.scale(-1, 1);
+			  }
               ctx.drawImage($video, 0, 0, canvas.width, hRatio);
               ctx.save();
               setTimeout(loop, 1000 / 30); // drawing at 30fps
@@ -408,7 +410,7 @@
   window.handleCaptureDocument = async function () {
     document.getElementById("loader").style.display = "block";
     const canvas = document.getElementsByTagName("canvas")[0];
-    const snapshot = canvas.toDataURL("image/jpeg", 1);
+    const snapshot = canvas.toDataURL("image/jpeg", 1).split(",")[1];	
     validateDocument(snapshot);
   };
 
