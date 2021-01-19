@@ -8,6 +8,7 @@ const lang = {
     faceVerificationFailedText:
       "Unfortunately, your face recognition is failed. Please try again.",
     exceptionText: "Something went wrong.",
+	exceptionDocumentText: "Please take a document photo again.",
     notVerifiedText: "Not Verified",
     failedText: "Failed",
     verifiedText: "Verified",
@@ -15,6 +16,8 @@ const lang = {
     idScanText: "Front Side",
     passportScanDescText: "Scan the data page of passport",
     idScanDescText: "Scan the front side of the document",
+	uploadoppositeText: "Upload the opposite side of the document",
+    oppositeText: "Scan the opposite side of the document",
     selfieText: "Selfie",
     makeSelfieText: "Make selfie",
     oppositeSideText: "Opposite Side",
