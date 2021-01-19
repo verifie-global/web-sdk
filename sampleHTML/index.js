@@ -64,19 +64,19 @@
     );
     return distance;
   };
-
-  const cosine = function cosinesim(A, B) {
-    let dotproduct = 0;
-    let mA = 0;
-    let mB = 0;
-    for (let i = 0; i < A.length; i++) {
-      dotproduct += A[i] * B[i];
-      mA += A[i] * A[i];
-      mB += B[i] * B[i];
+  
+  const cosine = function cosinesim(A,B){
+    var dotproduct=0;
+    var mA=0;
+    var mB=0;
+    for(i = 0; i < A.length; i++){
+        dotproduct += (A[i] * B[i]);
+        mA += (A[i]*A[i]);
+        mB += (B[i]*B[i]);
     }
     mA = Math.sqrt(mA);
     mB = Math.sqrt(mB);
-    const similarity = (dotproduct / mA) * mB;
+    var similarity = (dotproduct)/(mA)*(mB)
     return similarity;
   };
 
@@ -108,7 +108,7 @@
   const draw = function (text) {
     const drawing = document.getElementById("canvasTxt");
     const con = drawing.getContext("2d");
-    con.clearRect(0, 0, drawing.width, drawing.height);
+	con.clearRect(0, 0, drawing.width, drawing.height);
     //clear background
     con.fillStyle = "#eef6fe9e";
     const rect = con.roundedRectangle(
@@ -122,13 +122,14 @@
     rect.fill();
     con.fillStyle = "black";
     con.font = "20pt 'Roboto'";
-
+	
     con.fillText(text, 40, 60);
+	
   };
 
   window.buttonCallback = async function () {
     document.getElementsByClassName("canvas-outer")[0].style.display = "block";
-    document.getElementById("canvasTxt").style.display = "block";
+	document.getElementById("canvasTxt").style.display = "block";
     /*
       (0) check whether we're already running face detection
     */
@@ -137,7 +138,7 @@
     } // if yes, then do not initialize everything again
     window.canvasMode = "mobile";
     const canvas = document.getElementsByTagName("canvas")[0];
-    const canvasTxt = document.getElementById("canvasTxt");
+	const canvasTxt = document.getElementById("canvasTxt");
     const canvasWidth = window.innerWidth < 900 ? window.innerWidth - 30 : 640;
     const canvasHeight =
       window.innerWidth < 900 ? (window.innerWidth - 20) / Ratio : 480;
@@ -145,7 +146,7 @@
     canvas.height = canvasHeight;
     canvas.style.display = "block";
     const ctx = canvas.getContext("2d");
-
+    
     const faceOptions = {
       firstFixedPos: 0,
       lastFixedPos: 0,
@@ -157,14 +158,14 @@
       iterationTick: Date.now(),
       snapshotTickCompleted: false,
       failedStatus: false,
-      embedding1: Array(),
-      embedding2: Array(),
+	  embedding1: Array(),
+	  embedding2: Array(),
     };
 
     const canvasOptions = {
       ctx: ctx,
       canvas: canvas,
-      canvasTxt: canvasTxt,
+	  canvasTxt: canvasTxt,
       width: canvasWidth,
       height: canvasHeight,
     };
@@ -178,120 +179,99 @@
     });
 
     const processFn = async function (video, dt) {
-      // const hRatio = (canvas.width / video.videoWidth) * video.videoHeight;
-      video.addEventListener(
-        "play",
-        function () {
-          const $video = video;
-          const hRatio = (canvas.width / video.videoWidth) * video.videoHeight;
-          (function loop() {
-            if (!$video.paused && !$video.ended) {
-              canvas.height = hRatio;
-              ctx.translate(canvas.width, 0);
-              ctx.scale(-1, 1);
-              ctx.drawImage($video, 0, 0, canvas.width, hRatio);
-              ctx.save();
-              setTimeout(loop, 1000 / 30); // drawing at 30fps
-            }
-          })();
-        },
-        false
-      );
       if (video.readyState == 4) {
         initialized = true;
+		
+        const vRatio = (canvas.height / video.videoHeight) * video.videoWidth;
+        ctx.drawImage(video, 0, 0, vRatio, canvas.height);
+		
+        // fill horizontally
+        const hRatio = (canvas.width / video.videoWidth) * video.videoHeight;
 
+        ctx.drawImage(video, 0, 0, canvas.width, hRatio);
+		
         const dets = await model.estimateFaces(video);
         // draw detections
         if (dets.length > 0) {
           if (!faceOptions.snapshotTickCompleted) {
-            faceOptions.iterationTick = Date.now();
+			faceOptions.iterationTick = Date.now();
             processSnapshotTick(
               canvasOptions,
               faceOptions,
-              video,
+			  video,
               dets,
               draw,
               dist,
               tr,
-              cosine
+			  cosine
             );
-
+			
+			
             if (
               faceOptions.snapshotTickCompleted &&
               !faceOptions.failedStatus
             ) {
-              const dotProduct = faceOptions.embedding1
-                .map((val, i) => val * faceOptions.embedding2[i])
-                .reduce((accum, curr) => accum + curr, 0);
-              const vec1Size = Math.sqrt(
-                faceOptions.embedding1.reduce(
-                  (accum, curr) => accum + Math.pow(curr, 2),
-                  0
-                )
-              );
-              const vec2Size = Math.sqrt(
-                faceOptions.embedding2.reduce(
-                  (accum, curr) => accum + Math.pow(curr, 2),
-                  0
-                )
-              );
+			  const dotProduct = faceOptions.embedding1.map((val, i) => val * faceOptions.embedding2[i]).reduce((accum, curr) => accum + curr, 0);
+			  const vec1Size = Math.sqrt(faceOptions.embedding1.reduce((accum, curr) => accum + Math.pow(curr, 2), 0));
+              const vec2Size = Math.sqrt(faceOptions.embedding2.reduce((accum, curr) => accum + Math.pow(curr, 2), 0));
 
-              const similarity =
-                ((dotProduct / (vec1Size * vec2Size)) * 100 - 99) * 100;
-              if (similarity > 60) {
-                const snapshot = canvas.toDataURL("image/jpeg", 1);
-                
-                const editedSnap = await encodeImage(accessToken, snapshot);
-                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-                canvas.style.display = "none";
-                canvasTxt.style.display = "none";
-                this.stop();
-                document.getElementById("loader").style.display = "block";
-                try {
-                  const scoringDataRes = await getScoringData(editedSnap);
+              similarity = (((dotProduct / (vec1Size * vec2Size))*100)-99)*100;
+              if (similarity > 70){
+				  const snapshot = canvas.toDataURL("image/jpeg", 1);
 
-                  if (scoringDataRes.opDesc == "ok") {
-                    if (
-                      scoringDataRes.result.isMatched &&
-                      scoringDataRes.result.facialLiveness
-                    ) {
-                      const swapFireRes = await Swal.fire({
-                        title: tr.verifiedText,
-                        icon: "success",
-                        html: `<p>Dear <span id="nameText">${personData.firstname.toLowerCase()} ${personData.lastname.toLowerCase()}</span>, identity has been approved!</p>`,
-                      });
-                      if (swapFireRes.value) {
-                        window.location.href = "https://demo.verifie.ai/v2/";
-                      }
-                    } else {
-                      document.getElementById("content").style.display =
-                        "block";
-                      document.getElementById("uploadFirstPage").style.display =
-                        "block";
-                      document.getElementsByClassName(
-                        "canvas-outer"
-                      )[0].style.display = "none";
-                      const swapFireRes = await Swal.fire(
-						  tr.notVerifiedText,
-						  tr.faceVerificationFailedText,
-						  "error"
-						);
-					  if (swapFireRes.value) {
+				  const editedSnap = await encodeImage(accessToken, snapshot);
+				  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+				  canvas.style.display = "none";
+				  canvasTxt.style.display = "none";
+				  this.stop();
+				  document.getElementById("loader").style.display = "block";
+				  try {
+					const scoringDataRes = await getScoringData(editedSnap);
+					
+					if (scoringDataRes.opDesc == "ok") {
+					  if (
+						scoringDataRes.result.isMatched &&
+						scoringDataRes.result.facialLiveness
+					  ) {
+						const swapFireRes = await Swal.fire({
+						  title: tr.verifiedText,
+						  icon: "success",
+						  html: `<p>Dear <span id="nameText">${personData.firstname.toLowerCase()} ${personData.lastname.toLowerCase()}</span>, identity has been approved!</p>`,
+						});
+						if (swapFireRes.value) {
 						  window.location.href = "https://demo.verifie.ai/v2/";
+						}
+					  } else {
+						  document.getElementById("content").style.display =
+							"block";
+						  document.getElementById("uploadFirstPage").style.display =
+							"block";
+						  document.getElementsByClassName(
+							"canvas-outer"
+						  )[0].style.display = "none";
+						  const swapFireRes = await Swal.fire(
+							  tr.notVerifiedText,
+							  tr.faceVerificationFailedText,
+							  "error"
+							);
+						  if (swapFireRes.value) {
+							  window.location.href = "https://demo.verifie.ai/v2/";
+						  }
 					  }
-                    }
-                  } else {
-                    Swal.fire(tr.exceptionText, scoringDataRes.opDesc, "error");
-                  }
-                } finally {
-                  document.getElementById("loader").style.display = "none";
-                }
-                faceOptions.snapshotTickCompleted = true;
-                window.failedStatusTick = faceOptions.iterationTick;
-                faceOptions.failedStatus = false;
-              } else {
-                faceOptions.failedStatus = true;
-              }
+					} else {
+					  Swal.fire(tr.exceptionText, scoringDataRes.opDesc, "error");
+					}
+				  } finally {
+					document.getElementById("loader").style.display = "none";
+				  }
+				  faceOptions.snapshotTickCompleted = true;
+				  window.failedStatusTick = faceOptions.iterationTick;
+				  faceOptions.failedStatus = false;
+			  
+			  }
+			  else {
+				  faceOptions.failedStatus = true;
+			  }
             }
           } else if (
 				faceOptions.snapshotTickCompleted &&
@@ -334,26 +314,11 @@
     canvas.style.display = "block";
     const ctx = canvas.getContext("2d");
     DocumentCamvas = new camvas(ctx, function (video) {
-      video.addEventListener(
-        "play",
-        function () {
-          const $video = video;
-          const hRatio = (canvas.width / video.videoWidth) * video.videoHeight;
-          (function loop() {
-            if (!$video.paused && !$video.ended) {
-              canvas.height = hRatio;
-			  if (canvasMode == "mobile"){
-				ctx.translate(canvas.width, 0);
-				ctx.scale(-1, 1);
-			  }
-              ctx.drawImage($video, 0, 0, canvas.width, hRatio);
-              ctx.save();
-              setTimeout(loop, 1000 / 30); // drawing at 30fps
-            }
-          })();
-        },
-        false
-      );
+      const vRatio = (canvas.height / video.videoHeight) * video.videoWidth;
+      ctx.drawImage(video, 0, 0, vRatio, canvas.height);
+      // fill horizontally
+      const hRatio = (canvas.width / video.videoWidth) * video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, hRatio);
     });
     document.getElementById("takePhotoBtn").style.display = "none";
     if (documentType === "passport") {
@@ -413,7 +378,7 @@
     const snapshot = canvas.toDataURL("image/jpeg", 1).split(",")[1];	
     validateDocument(snapshot);
   };
-
+  
   const validateDocument = async function (editedSnap, isUpload = false) {
     document.getElementById("loader").style.display = "block";
     const documentDataRes = await getDocumentData(editedSnap);
@@ -424,41 +389,62 @@
           (documentDataRes.result.documentType === "idCard" &&
             !documentDataRes.result.nextPage)
         ) {
-          document.getElementById("captureBtn").style.display = "none";
-          document.getElementById("canvas").style.display = "none";
-          document.getElementById("uploadSecondPage").style.display = "none";
-          personData = documentDataRes.result;
-          const swapFireRes = await Swal.fire({
-            title: tr.selfieText,
-            icon: "info",
-            text: tr.makeSelfieText,
-          });
-          if (swapFireRes.value) {
-            window.canvasMode = "mobile";
-            if (!isUpload) {
-              DocumentCamvas.stop();
-            }
-            buttonCallback();
-          }
+		  if (documentType === "idCard" && documentDataRes.result.documentType === "passport") {
+				document.getElementById("content").style.display = "block";
+				document.getElementById("uploadFirstPage").style.display = "block";
+				Swal.fire({
+				title: tr.exceptionText,
+				text: tr.exceptionDocumentText,
+				icon: "error",
+				});
+		  } else {
+			  document.getElementById("captureBtn").style.display = "none";
+			  document.getElementById("canvas").style.display = "none";
+			  document.getElementById("uploadSecondPage").style.display = "none";
+			  personData = documentDataRes.result;
+			  const swapFireRes = await Swal.fire({
+				title: tr.selfieText,
+				icon: "info",
+				text: tr.makeSelfieText,
+			  });
+			  if (swapFireRes.value) {
+				window.canvasMode = "mobile";
+				if (!isUpload) {
+				  DocumentCamvas.stop();
+				}
+				buttonCallback();
+			  }
+		  }
         } else if (
           documentDataRes.result.documentType === "idCard" &&
           documentDataRes.result.nextPage
         ) {
-          const message = isUpload
-            ? "Upload the opposite side of the document"
-            : "Scan the opposite side of the document";
-          await Swal.fire(tr.oppositeSideText, message, "info");
-          document.querySelector("#document2").click();
+			if (documentType === "passport") {
+				document.getElementById("content").style.display = "block";
+				document.getElementById("uploadFirstPage").style.display = "block";
+				Swal.fire({
+				title: tr.exceptionText,
+				text: tr.exceptionDocumentText,
+				icon: "error",
+				});
+			}
+			else {
+			  const message = isUpload
+				? tr.uploadoppositeText
+				: tr.oppositeText;
+			  await Swal.fire(tr.oppositeSideText, message, "info");
+			  document.querySelector("#document2").click();
 
-          if (isUpload) {
-            document.getElementById("content").style.display = "none";
-            document.getElementById("uploadFirstPage").style.display = "none";
-            document.getElementById("backSideDocContent").style.display =
-              "block";
-          }
+			  if (isUpload) {
+				document.getElementById("content").style.display = "none";
+				document.getElementById("uploadFirstPage").style.display = "none";
+				document.getElementById("backSideDocContent").style.display =
+				  "block";
+			  }
+			}
         }
       } else {
-        document.getElementById("content").style.display = "block";
+		document.getElementById("content").style.display = "block";
         document.getElementById("uploadFirstPage").style.display = "block";
         Swal.fire({
           title: tr.exceptionText,
@@ -504,7 +490,7 @@
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = function () {
-        resolve(reader.result.split(",")[1]);
+        resolve(reader.result.split(',')[1]);
       };
       reader.onerror = function (error) {
         reject(error);
