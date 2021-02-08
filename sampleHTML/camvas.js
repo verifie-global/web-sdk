@@ -1,27 +1,28 @@
 function camvas(ctx, callback) {
   document.getElementById("loader").style.display = "none";
-  var self = this
-  this.ctx = ctx
-  this.callback = callback
-
+  var self = this;
+  this.ctx = ctx;
+  this.callback = callback;
+  const Ratio = 0.8;
   // We can't `new Video()` yet, so we'll resort to the vintage
   // "hidden div" hack for dynamic loading.
-  var streamContainer = document.createElement('div')
-  this.video = document.createElement('video')
+
+  var streamContainer = document.createElement('div');
+  this.video = document.createElement('video');
 
   // If we don't do this, the stream will not be played.
   // By the way, the play and pause controls work as usual 
   // for streamed videos.
-  this.video.setAttribute('autoplay', '1')
-  this.video.setAttribute('playsinline', '1') // important for iPhones
+  this.video.setAttribute('autoplay', '1');
+  this.video.setAttribute('playsinline', '1'); // important for iPhones
 
   // The video should fill out all of the canvas
-  this.video.width = 1;
-  this.video.height = 1;
+  this.video.width = window.innerWidth < 900 ? window.innerWidth - 30 : 640;
+  this.video.height = window.innerWidth < 900 ? (window.innerWidth - 20) / Ratio : 480;
 
-  streamContainer.appendChild(this.video)
-  document.body.appendChild(streamContainer)
-  const Ratio = 0.8;
+  streamContainer.appendChild(this.video);
+  document.getElementById("canvas-outer").appendChild(streamContainer);
+  
 
 const getConfig = () => {
   if (window.innerWidth < 900) {
@@ -35,7 +36,7 @@ const getConfig = () => {
     } else {
       return {
         video : {
-          height: (window.innerWidth - 20)/ Ratio,
+          //height: parseInt((window.innerWidth - 20)/ Ratio),
           facingMode: "user",
         },
         audio: false,
@@ -57,15 +58,12 @@ if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
     // we can start having fun
     self.video.srcObject = stream;
 	if (canvasMode === "mobile") {
-		ctx.save();
-		ctx.translate(canvas.width, 0);
-		ctx.scale(-1, 1);
+		self.video.style = "-webkit-transform:scaleX(-1);transform:scaleX(-1);";
 	}
-	// Let's start drawing the canvas!
+	
     cameraStartTick = Date.now();
     failedStatusTick = Date.now();
-    document.getElementById("canvas").classList.add("visible");
-	document.getElementById("canvasTxt").classList.add("visible");
+    document.getElementById("canvasTxt").classList.add("visible");
     self.update()
   }, function(err) {
     throw err
@@ -78,6 +76,7 @@ if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
     
     const tracks = self.video.srcObject.getTracks();
     tracks[0].stop();
+    document.getElementsByTagName("video")[0].remove();
   }
 
   // As soon as we can draw a new frame on the canvas, we call the `draw` function 
