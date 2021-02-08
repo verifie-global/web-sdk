@@ -1,4 +1,4 @@
-(function (window, document) {
+(async function (window, document) {
   let tr = lang.en;
 
   let initialized = false;
@@ -9,6 +9,16 @@
   let encodedImg = "";
   let DocumentCamvas;
   const Ratio = 0.8;
+  tf.setBackend("wasm");
+  await tf.ready();
+  // load facemesh model
+  let model;
+  facemesh.load({
+    maxFaces: 1,
+    detectionConfidence: 0.95,
+  }).then((res) => {
+	  model = res;
+  });
 
   const fillStaticContent = function () {
     if (!tr) {
@@ -121,7 +131,7 @@
     rect.stroke();
     rect.fill();
     con.fillStyle = "black";
-    con.font = "20pt 'Roboto'";
+    con.font = "18pt 'Roboto'";
 	
     con.fillText(text, 40, 60);
 	
@@ -140,12 +150,11 @@
     const canvas = document.getElementsByTagName("canvas")[0];
 	const canvasTxt = document.getElementById("canvasTxt");
     const canvasWidth = window.innerWidth < 900 ? window.innerWidth - 30 : 640;
-    const canvasHeight =
-      window.innerWidth < 900 ? (window.innerWidth - 20) / Ratio : 480;
+    const canvasHeight = window.innerWidth < 900 ? (window.innerWidth - 20) / Ratio : 480;
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
-    canvas.style.display = "block";
-    const ctx = canvas.getContext("2d");
+	canvas.style.display = "none";
+	const ctx = canvas.getContext("2d");
     
     const faceOptions = {
       firstFixedPos: 0,
@@ -170,25 +179,17 @@
       height: canvasHeight,
     };
 
-    await tf.setBackend("wasm");
-    await tf.ready();
-    // load facemesh model
-    const model = await facemesh.load({
-      maxFaces: 1,
-      detectionConfidence: 0.95,
-    });
-
     const processFn = async function (video, dt) {
       if (video.readyState == 4) {
         initialized = true;
 		
-        const vRatio = (canvas.height / video.videoHeight) * video.videoWidth;
-        ctx.drawImage(video, 0, 0, vRatio, canvas.height);
+        //const vRatio = (canvas.height / video.videoHeight) * video.videoWidth;
+        //ctx.drawImage(video, 0, 0, vRatio, canvas.height);
 		
         // fill horizontally
-        const hRatio = (canvas.width / video.videoWidth) * video.videoHeight;
+        //const hRatio = (canvas.width / video.videoWidth) * video.videoHeight;
 
-        ctx.drawImage(video, 0, 0, canvas.width, hRatio);
+        //ctx.drawImage(video, 0, 0, canvas.width, hRatio);
 		
         const dets = await model.estimateFaces(video);
         // draw detections
@@ -216,7 +217,9 @@
               const vec2Size = Math.sqrt(faceOptions.embedding2.reduce((accum, curr) => accum + Math.pow(curr, 2), 0));
 
               similarity = (((dotProduct / (vec1Size * vec2Size))*100)-99)*100;
-              if (similarity > 70){
+			  
+              if (similarity > 60){
+				  canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
 				  const snapshot = canvas.toDataURL("image/jpeg", 1);
 
 				  const editedSnap = await encodeImage(accessToken, snapshot);
@@ -309,16 +312,17 @@
     document.getElementById("uploadFirstPage").style.display = "none";
     document.getElementsByClassName("canvas-outer")[0].style.display = "block";
     const canvas = document.getElementsByTagName("canvas")[0];
-    canvas.width = window.innerWidth < 900 ? window.innerWidth - 20 : 600;
-    canvas.height = window.innerWidth < 900 ? 220 : 400;
-    canvas.style.display = "block";
+    //canvas.width = window.innerWidth < 900 ? window.innerWidth - 20 : 600;
+    //canvas.height = window.innerWidth < 900 ? 220 : 400;
+    //canvas.style.display = "block";
     const ctx = canvas.getContext("2d");
     DocumentCamvas = new camvas(ctx, function (video) {
-      const vRatio = (canvas.height / video.videoHeight) * video.videoWidth;
-      ctx.drawImage(video, 0, 0, vRatio, canvas.height);
+	  //canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      //const vRatio = (canvas.height / video.videoHeight) * video.videoWidth;
+      //ctx.drawImage(video, 0, 0, vRatio, canvas.height);
       // fill horizontally
-      const hRatio = (canvas.width / video.videoWidth) * video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, hRatio);
+      //const hRatio = (canvas.width / video.videoWidth) * video.videoHeight;
+      //ctx.drawImage(video, 0, 0, canvas.width, hRatio);
     });
     document.getElementById("takePhotoBtn").style.display = "none";
     if (documentType === "passport") {
@@ -375,12 +379,18 @@
   window.handleCaptureDocument = async function () {
     document.getElementById("loader").style.display = "block";
     const canvas = document.getElementsByTagName("canvas")[0];
+	const video = document.getElementsByTagName("video")[0];
+	canvas.width = video.width;
+	canvas.height = video.height;
+	
+	canvas.getContext('2d').drawImage(video, 0, 0, video.width, video.height);
     const snapshot = canvas.toDataURL("image/jpeg", 1).split(",")[1];	
     validateDocument(snapshot);
   };
   
   const validateDocument = async function (editedSnap, isUpload = false) {
     document.getElementById("loader").style.display = "block";
+	document.getElementById("canvas").style.display = "none";
     const documentDataRes = await getDocumentData(editedSnap);
     try {
       if (documentDataRes.opDesc === "ok") {
@@ -433,9 +443,8 @@
 				? tr.uploadoppositeText
 				: tr.oppositeText;
 			  await Swal.fire(tr.oppositeSideText, message, "info");
-			  document.querySelector("#document2").click();
-
 			  if (isUpload) {
+				document.querySelector("#document2").click();
 				document.getElementById("content").style.display = "none";
 				document.getElementById("uploadFirstPage").style.display = "none";
 				document.getElementById("backSideDocContent").style.display =
@@ -444,8 +453,8 @@
 			}
         }
       } else {
-		document.getElementById("content").style.display = "block";
-        document.getElementById("uploadFirstPage").style.display = "block";
+		//document.getElementById("content").style.display = "block";
+        //document.getElementById("uploadFirstPage").style.display = "block";
         Swal.fire({
           title: tr.exceptionText,
           text: documentDataRes.opDesc,
@@ -453,7 +462,6 @@
         });
       }
     } finally {
-      //swal("","","info")
       document.getElementById("loader").style.display = "none";
     }
   };
