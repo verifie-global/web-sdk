@@ -150,6 +150,8 @@ body {
   border-radius: 5px;
   position: absolute;
   top: 25px;
+  z-index: 999;
+  left: 10px;
 }
 
 .canvas-outer {
@@ -159,6 +161,7 @@ body {
   border-radius: 5px;
   box-shadow: 0px 0px 5px 3px #eae9e9;
   display: none;
+  position: relative;
 }
 
 .swal-text {
